@@ -50,6 +50,7 @@ export const i18n = {
 "Bytes": "Bytes",
 "Location": "Location",
 "UploadQuotaExceeded": "Upload quota exceeded because maximum space allowed is {{diskMaxGB}} GB, the current space available is {{diskAvailableMB}} MB and the upload size is {{uploadSizeMB}} MB.",
+"UploadSizeZero": "Upload failed: The file is empty. Please select a file with content and try again.",
 "QuoteStatusDesktop": "{{{value}}}% of {{{quotaGB}}} GB",
 "QuoteStatusMobile": "{{{quotaGB}}} GB, {{{value}}}% used",
 "FileExistsWarning": "File {{name}} already exists. Please select one of the following options.",

@@ -631,7 +631,8 @@ const _checkQuotaAndReportError = async (element, uploadSize) => {
    if ((!uploadQuotaCheckResult) || (!uploadQuotaCheckResult.result)) { // stop upload if it will exceed the quota
       if (uploadQuotaCheckResult) LOG.error(`Upload size exceeds quota. User ID is ${user}, upload size ${uploadSize}, quota is ${uploadQuotaCheckResult.quota} and the current user disk size is ${uploadQuotaCheckResult.currentsize}.`); 
       else LOG.error("Check quota call failed, unable to upload for user "+user);
-      _showErrorDialog(null, uploadQuotaCheckResult ? (await router.getMustache()).render((await i18n.get("UploadQuotaExceeded")), 
+      if(!uploadSize) _showErrorDialog(null, await i18n.get("UploadSizeZero"));
+      else _showErrorDialog(null, uploadQuotaCheckResult ? (await router.getMustache()).render((await i18n.get("UploadQuotaExceeded")), 
          {diskAvailableMB: _roundToTwo((uploadQuotaCheckResult.quota-uploadQuotaCheckResult.currentsize)/(1024*1024)), 
          diskMaxGB: _roundToTwo(uploadQuotaCheckResult.quota/(1024*1024*1024)), uploadSizeMB: _roundToTwo(uploadSize/(1024*1024))}) : undefined); 
       return false; 
