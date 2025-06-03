@@ -80,7 +80,7 @@ async function _verifyJWT(jsonReq) {
     try {
         const _decodeBase64 = string => Buffer.from(string, "base64").toString("utf8");
         const jwtClaims = JSON.parse(_decodeBase64(jsonReq.jwt.split(".")[1]));
-        const finalResult = {...jwtClaims , role: jwtClaims.role, ...CONSTANTS.TRUE_RESULT, tokenflag: true};
+        const finalResult = {...jwtClaims, org: jwtClaims.org.toLowerCase(), role: jwtClaims.role, ...CONSTANTS.TRUE_RESULT, tokenflag: true};
 		await _informLoginListeners(finalResult);
         return finalResult;
     } catch (err) {
