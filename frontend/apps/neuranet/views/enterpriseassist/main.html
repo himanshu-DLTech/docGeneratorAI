@@ -118,7 +118,7 @@ span#collapser {display: none;}
 <div id="maincontainer">
 
 <chat-box id="enterpriseassistant" chatapi="{{APP_CONSTANTS.API_PATH}}/{{aiendpoint}}"
-    attach="true" attachaccepts=".txt,.docx.,.pdf,.xlsx" maxattachsize="4194304" maxattachsizeerror="{{i18n.MaxSizeError}}"
+    attach="true" attachaccepts=".txt,.docx,.pdf,.xlsx" maxattachsize="4194304" maxattachsizeerror="{{i18n.MaxSizeError}}"
     maxattachments="4" maxattachmentserror="{{i18n.MaxAttachmentsError}}"
     onresult="window.monkshu_env.apps[APP_CONSTANTS.APP_NAME].enterprise_assist_main.processAssistantResponse(chatbox, result, 'enterpriseassistant', '{{{activeaiapp.id}}}')"
     onrequest="window.monkshu_env.apps[APP_CONSTANTS.APP_NAME].enterprise_assist_main.getAssistantRequest(prompt, files, 'enterpriseassistant', '{{{activeaiapp.id}}}')"></chat-box>
