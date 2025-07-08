@@ -60,6 +60,7 @@ export const i18n = {
 "AIWorkshop_AIAppGenericError": "Error in AI application",
 "AIWorkshop_AIAppGenericSuccess": "Command succeeded",
 "AIWorkshop_AIAppAlreadyExists": "Error an app by that ID already exists",
+"AIWorkshop_NotAdmin": "You do not have required permissions. Please contact your administrator.",
 "AIWorkshop_ClickAppToEdit": "Click to edit",
 "AIWorkshop_KnowledgeBase": "AI Training"
 }
