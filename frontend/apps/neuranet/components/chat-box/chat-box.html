@@ -340,6 +340,8 @@ div.collapsiblecontent {max-height: 0; overflow: hidden; transition: max-height 
         <span id="attachedfiles"><!-- attached files go here --></span>
         <input type="checkbox" id="multiline" onclick="this.parentNode.parentNode.querySelector('textarea#messagearea').focus()"><label for="multiline">{{i18n.Multiline}}</label>
         {{#ATTACHMENT_ALLOWED}}<img id="attach" onclick="monkshu_env.components['chat-box'].attach(this)" src="{{{COMPONENT_PATH}}}/img/attach.svg">{{/ATTACHMENT_ALLOWED}}
+        <img id="mic" src="{{{COMPONENT_PATH}}}/img/mic.svg" title="Speak" sttAPI="/apps/{{app}}/stt"
+        onclick="monkshu_env.components['chat-box'].startVoiceInput(this)">
         <img id="send" onclick="monkshu_env.components['chat-box'].send(this)" src="{{{COMPONENT_PATH}}}/img/send.svg">
     </span>
 </div>
@@ -368,6 +370,8 @@ div.collapsiblecontent {max-height: 0; overflow: hidden; transition: max-height 
                     spanAIResponse2.dataset.content, 
                     spanAIResponse2.dataset.content_mime, 
                     `chat_${new Date(Date.now()).toLocaleString().replaceAll(' ', '_').replaceAll(',', '')}.html`)">
+        <img class="controls" src="{{{COMPONENT_PATH}}}/img/speaker.svg" title="Play Audio" ttsAPI="/apps/{{app}}/tts"
+                onclick="monkshu_env.components['chat-box'].playTTS(this)">
     </span>
 </template>
 

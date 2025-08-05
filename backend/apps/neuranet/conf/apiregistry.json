@@ -11,6 +11,7 @@
     "/apps/{{app}}/llmflow" : "/neuranetapp/apis/llmflow.js?customSecurity=loginapp_key_checker&loginapp_key_checker_enforce_for_jwt=id,org",
     "/apps/{{app}}/indexdoc" : "/neuranetapp/apis/indexdoc.js?customSecurity=loginapp_key_checker&loginapp_key_checker_enforce_for_jwt=id,org",
     "/apps/{{app}}/unindexdoc" : "/neuranetapp/apis/unindexdoc.js?customSecurity=loginapp_key_checker&loginapp_key_checker_enforce_for_jwt=id,org",
+    "/apps/{{app}}/voiceTools" : "/neuranetapp/apis/voicetools.js?keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=true&checkClaims=id,org",
 
     
     "/apps/{{app}}/getfiles" : "/xbinapp/apis/getfiles.js?get=true&keys=fheiwu98237hjief8923ydewjidw834284hwqdnejwr79389&needsToken=user,admin",

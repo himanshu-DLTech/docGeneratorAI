@@ -14,6 +14,7 @@ import {marked} from "./3p/marked.esm.min.js";
 import {router} from "/framework/js/router.mjs";
 import {apimanager as apiman} from "/framework/js/apimanager.mjs";
 import {monkshu_component} from "/framework/js/monkshu_component.mjs";
+import {session} from "/framework/js/session.mjs";
 
 const COMPONENT_PATH = util.getModulePathFromURL(import.meta.url), DEFAULT_MAX_ATTACH_SIZE = 4194304, 
     DEFAULT_MAX_ATTACH_SIZE_ERROR = "File size is larger than allowed size";
@@ -56,6 +57,162 @@ async function send(containedElement) {
         disMessage.classList.remove("disabled"), checkBox.removeAttribute("disabled");
         userMessageArea.readOnly = false;
     }   
+}
+
+async function startVoiceInput(containedElement) {
+    console.log("STT: Triggered");
+
+    const shadowRoot = chat_box.getShadowRootByContainedElement(containedElement);
+    const textarea = shadowRoot.querySelector("textarea#messagearea");
+    const micButton = shadowRoot.querySelector("img#mic");
+    const disMessage = shadowRoot.querySelector("div#message");
+    const host = chat_box.getHostElement(containedElement);
+
+    const sttAPI = `${APP_CONSTANTS.API_PATH}/voiceTools`;
+    console.log("STT: API endpoint →", sttAPI);
+
+    let mediaRecorder, audioChunks = [], stream;
+
+    const showSpinner = () => {
+        textarea.readOnly = true;
+        disMessage.classList.add("disabled");
+        micButton.dataset.originalSrc = micButton.src;
+        micButton.src = `${COMPONENT_PATH}/img/spinner.svg`;
+        micButton.classList.add("rotating");
+    };
+    const restoreMic = () => {
+        textarea.readOnly = false;
+        disMessage.classList.remove("disabled");
+        micButton.src = micButton.dataset.originalSrc;
+        micButton.classList.remove("rotating");
+    };
+
+    const handleRecordingStop = async () => {
+        console.log("STT: Recording stopped, preparing request...");
+        showSpinner(); 
+        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+        const audioBase64 = await _blobToBase64(audioBlob);
+        stream.getTracks().forEach(t => t.stop()); 
+
+        const request = { 
+            service: "stt", 
+            id: session.get(APP_CONSTANTS.USERID), 
+            org: session.get(APP_CONSTANTS.USERORG), 
+            audiofile: audioBase64 
+        };
+
+        try {
+            const result = await apiman.rest(sttAPI, "POST", request, true);
+            console.log("STT: API raw response →", result);
+
+            const transcript = result?.text || "";
+            if (result?.result && transcript.trim()) {
+                textarea.value = transcript.trim();
+                textarea.focus();
+                console.log("STT: Transcription →", transcript);
+            } else {
+                console.error("STT: API returned no valid transcription");
+                alert("Voice recognition failed: " + (result?.reason || "Unknown error"));
+            }
+        } catch (err) {
+            console.error("STT API Error:", err);
+            alert("STT service unavailable");
+        } finally {
+            restoreMic(); 
+        }
+    };
+
+    micButton.onmousedown = async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = handleRecordingStop;
+
+            mediaRecorder.start();
+            console.log("STT: Recording started (hold mic to record)...");
+        } catch (err) {
+            console.error("Voice input error:", err);
+            alert("Microphone access failed");
+        }
+    };
+
+    micButton.onmouseup = micButton.ontouchend = () => {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            console.log("STT: Recording stopped by user.");
+        }
+    };
+}
+
+async function playTTS(containedElement) {
+    console.log("TTS: Triggered");
+    try {
+        const shadowRoot = chat_box.getShadowRootByContainedElement(containedElement);
+        const aiResponseEl = containedElement.closest("span#aicontentholder")?.querySelector("span#airesponse");
+
+        if (!aiResponseEl) {
+            console.error("TTS: AI response element not found");
+            return;
+        }
+
+        const text = aiResponseEl.innerText.trim();
+        if (!text) {
+            console.warn("TTS: No text available to synthesize");
+            return;
+        }
+
+        const host = chat_box.getHostElement(containedElement);
+        const ttsAPI =  `${APP_CONSTANTS.API_PATH}/voiceTools`;
+        console.log("TTS: API endpoint →", ttsAPI);
+
+        const result = await apiman.rest(ttsAPI, "POST", { service: "tts",id: session.get(APP_CONSTANTS.USERID), org: session.get(APP_CONSTANTS.USERORG), text }, true);
+        console.log("TTS: API raw response →", result);
+
+        if (!result?.result) {
+            console.error("TTS: API returned failure", result);
+            alert("TTS playback failed: " + (result?.reason || "Unknown error"));
+            return;
+        }
+
+        let audioBase64 = result.audiofile;
+        if (!audioBase64 && result.response?.audiofile) {
+            audioBase64 = result.response.audiofile;
+        }
+
+        const onResult = host.getAttribute("onresult");
+        if (onResult) {
+            const resultProcessor = util.createAsyncFunction(`return await ${onResult};`);
+            const processedResult = await resultProcessor({ chatbox: this, result });
+            if (processedResult?.ok && processedResult.response?.audiofile) {
+                audioBase64 = processedResult.response.audiofile;
+            }
+        }
+
+        if (audioBase64) {
+            const audioSrc = `data:audio/mp3;base64,${audioBase64}`;
+            const audio = new Audio(audioSrc);
+            audio.play().catch(err => console.error("TTS: Playback error", err));
+            console.log("TTS: Playing audio...");
+        } else {
+            console.error("TTS: No audiofile found in API response");
+            alert("TTS playback failed: Missing audio data");
+        }
+    } catch (err) {
+        console.error("TTS Error:", err);
+        alert("TTS service unavailable");
+    }
+}
+
+function _blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
 }
 
 async function attach(containedElement) {
@@ -145,5 +302,5 @@ function _latexedMarkdownToHTML(text) {
 
 const _getMemory = containedElement => chat_box.getMemoryByContainedElement(containedElement);
  
-export const chat_box = {trueWebComponentMode: true, elementConnected, elementRendered, send, attach, detach, getCollapsibleSection}
+export const chat_box = {trueWebComponentMode: true, elementConnected, elementRendered, send, attach, detach, getCollapsibleSection, startVoiceInput, playTTS}
 monkshu_component.register("chat-box", `${COMPONENT_PATH}/chat-box.html`, chat_box);

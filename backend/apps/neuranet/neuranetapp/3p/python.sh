@@ -357,6 +357,16 @@ function init_python_env() {
   pip install distro-info
   pip install Flask-CacheBuster
   pip install docx2txt
+  pip install gtts
+  pip install sys
+  pip install json
+  pip install zlib
+  pip install base64
+  pip install os
+  pip install tempfile
+  pip install langdetect
+  pip install openai-whisper
+  pip install "numpy<2" 
 }
 
 if [ -d "$SCRIPT_DIR/neuranetpy" ]; then

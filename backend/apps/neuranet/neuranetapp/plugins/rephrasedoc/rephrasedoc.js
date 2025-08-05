@@ -48,9 +48,9 @@ async function generate(fileindexer, generatorDefinition) {
     }
     let rephrasedSplits = [], promisesToWaitFor = []; for (const [index, split] of splits.entries()) {
         const lang_fragment = langdetector.getISOLang(split);
-        promptData.fragment = split; promptData.lang_fragment = lang_fragment;
+        const promptDataClone = { ...promptData, fragment: split, lang_fragment }; // shallow copy per iteration
         const promptToUse = generatorDefinition[`prompt_fragment_${lang_fragment}`] || generatorDefinition[`prompt_${langDetected}`] || generatorDefinition.prompt;
-        promisesToWaitFor.push(queueAnswer(promptToUse, promptData, index));
+        promisesToWaitFor.push(queueAnswer(promptToUse, promptDataClone, index));
     }
     try {await Promise.all(promisesToWaitFor)} catch (err) {
         LOG.error(`Unable to generate rephrased document due to error ${err}`);
