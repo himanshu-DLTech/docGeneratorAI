@@ -15,7 +15,7 @@ div#loginmain {
 	flex-direction: row;
 	row-gap: 1em;
 	align-items: center;
-	justify-content: space-around;
+	justify-content: space-evenly;
 	height: 100%;
 }
 
@@ -42,7 +42,7 @@ div#advtextbox span.button {
 	border-radius: 1em;
 	padding: 1em;
 	font-size: smaller;
-	margin-top: 3em;
+	margin-top: 1em;
 	cursor: pointer;
 	width: 8em;
 	color: #4c4c4c;
@@ -77,10 +77,13 @@ div#lgbox img {height: 4em; width: 100%;}
 	cursor: pointer;
 	font-size: 11px;
 }
+
 </style>
 {{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_PORTRAIT_START}}}
-	div#loginmain {flex-direction: column; justify-content: unset; margin-bottom: 1em;}
-	div#advtextbox {margin-top: 20%; margin-bottom: 2em;}
+	div#loginmain {flex-direction: column; margin-bottom: 1em;}
+	div#advtextbox {margin-top: 1.5em; margin-bottom: 0.5em; width: 80%;}
+	div#advtextbox img#logo { width: 60%; }
+	div#lgbox { padding: 1em 2em; }
 {{{APP_CONSTANTS.MOBILE_MEDIA_QUERY_PORTRAIT_END}}}
 
 <!doctype html>
