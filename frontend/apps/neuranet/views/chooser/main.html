@@ -67,12 +67,14 @@
         margin-bottom: 1em;
     }
     span#viewlabel {
+        display: block;  
         width: 100%;
         text-align: center;
         color: #007BB0;
         max-height: 1.5em;
         user-select: none;
         white-space: nowrap;
+        overflow: hidden;   
         text-overflow: ellipsis;
     }
 </style>
@@ -101,7 +103,7 @@
 
 <div id="icons">
     {{#views}}
-    <div id="viewicon" onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].neuranetapp.openView('{{{viewid}}}')">
+    <div id="viewicon" title="{{viewlabel}} onclick="monkshu_env.apps[APP_CONSTANTS.APP_NAME].neuranetapp.openView('{{{viewid}}}')">
         <img id="viewicon" src="{{viewicon}}">
         <span id="viewlabel">{{viewlabel}}</span>
     </div>
